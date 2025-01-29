@@ -1,7 +1,7 @@
 const fetch = require("node-fetch");
 const cheerio = require("cheerio");
 
-exports.handler = async function(event, context) {
+exports.handler = async function(event) {
     const url = event.queryStringParameters.url;
     if (!url) {
         return { statusCode: 400, body: JSON.stringify({ error: "Missing URL" }) };
@@ -24,7 +24,7 @@ exports.handler = async function(event, context) {
     } catch (error) {
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: "Failed to fetch media" }),
+            body: JSON.stringify({ error: "Failed to fetch media", details: error.message }),
         };
     }
 };
