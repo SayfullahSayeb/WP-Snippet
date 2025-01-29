@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitter Media Downloader</title>
+</head>
+<body>
+    <h2>Enter Twitter Post URL</h2>
+    <input type="text" id="tweetUrl" placeholder="Enter Tweet URL" style="width: 80%;">
+    <button onclick="fetchMedia()">Get Media</button>
+    <br><br>
+    <div id="mediaContainer"></div>
+
+    <script>
+        async function fetchMedia() {
+            let tweetUrl = document.getElementById("tweetUrl").value;
+            let response = await fetch(`/.netlify/functions/getTwitterMedia?url=${encodeURIComponent(tweetUrl)}`);
+            let data = await response.json();
+            let mediaContainer = document.getElementById("mediaContainer");
+            mediaContainer.innerHTML = "";
+
+            if (data.media && data.media.length > 0) {
+                data.media.forEach(url => {
+                    let mediaElement;
+                    if (url.includes(".jpg") || url.includes(".png")) {
+                        mediaElement = `<img src="${url}" style="max-width: 100%;">`;
+                    } else if (url.includes(".mp4")) {
+                        mediaElement = `<video controls style="max-width: 100%;"><source src="${url}" type="video/mp4"></video>`;
+                    }
+                    mediaContainer.innerHTML += `<div>${mediaElement}<br><a href="${url}" download>Download</a></div><br>`;
+                });
+            } else {
+                mediaContainer.innerHTML = "<p>No media found!</p>";
+            }
+        }
+    </script>
+</body>
+</html>
