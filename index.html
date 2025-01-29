@@ -3,35 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Twitter Media Downloader</title>
+    <title>Twitter Video Downloader</title>
 </head>
 <body>
-    <h2>Enter Twitter Post URL</h2>
-    <input type="text" id="tweetUrl" placeholder="Enter Tweet URL" style="width: 80%;">
-    <button onclick="fetchMedia()">Get Media</button>
-    <br><br>
-    <div id="mediaContainer"></div>
+    <h2>Twitter Video Downloader</h2>
+    <input type="text" id="tweetUrl" placeholder="Paste Twitter/X URL here">
+    <button onclick="fetchVideo()">Get Video</button>
+    <div id="videoLinks"></div>
 
     <script>
-        async function fetchMedia() {
-            let tweetUrl = document.getElementById("tweetUrl").value;
-            let response = await fetch(`/.netlify/functions/getTwitterMedia?url=${encodeURIComponent(tweetUrl)}`);
-            let data = await response.json();
-            let mediaContainer = document.getElementById("mediaContainer");
-            mediaContainer.innerHTML = "";
+        async function fetchVideo() {
+            let tweetURL = document.getElementById("tweetUrl").value;
+            let apiUrl = `/.netlify/functions/getTwitterMedia?url=${encodeURIComponent(tweetURL)}`;
 
-            if (data.media && data.media.length > 0) {
-                data.media.forEach(url => {
-                    let mediaElement;
-                    if (url.includes(".jpg") || url.includes(".png")) {
-                        mediaElement = `<img src="${url}" style="max-width: 100%;">`;
-                    } else if (url.includes(".mp4")) {
-                        mediaElement = `<video controls style="max-width: 100%;"><source src="${url}" type="video/mp4"></video>`;
-                    }
-                    mediaContainer.innerHTML += `<div>${mediaElement}<br><a href="${url}" download>Download</a></div><br>`;
-                });
-            } else {
-                mediaContainer.innerHTML = "<p>No media found!</p>";
+            try {
+                let response = await fetch(apiUrl);
+                let data = await response.json();
+
+                let outputDiv = document.getElementById("videoLinks");
+                outputDiv.innerHTML = ""; // Clear previous results
+
+                if (data.media.length > 0) {
+                    data.media.forEach(link => {
+                        outputDiv.innerHTML += `<a href="${link}" target="_blank">Download Video</a><br>`;
+                    });
+                } else {
+                    outputDiv.innerHTML = "<p>No video found in this tweet!</p>";
+                }
+            } catch (error) {
+                alert("Error fetching video!");
             }
         }
     </script>

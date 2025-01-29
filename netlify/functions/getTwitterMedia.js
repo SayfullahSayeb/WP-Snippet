@@ -1,33 +1,22 @@
 const fetch = require("node-fetch");
-const cheerio = require("cheerio");
 
-exports.handler = async function(event) {
-    const url = event.queryStringParameters.url;
-    if (!url) {
-        return { statusCode: 400, body: JSON.stringify({ error: "Missing URL" }) };
-    }
+exports.handler = async (event) => {
+    const { url } = event.queryStringParameters;
+    if (!url) return { statusCode: 400, body: "Missing URL" };
 
     try {
         const response = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
         const html = await response.text();
 
-        console.log("Fetched HTML:", html); // DEBUG: Print Twitter's response
-
-        const $ = cheerio.load(html);
-        let mediaUrls = [];
-
-        $("meta[property='og:image'], meta[property='og:video']").each((_, element) => {
-            mediaUrls.push($(element).attr("content"));
-        });
+        // Extract video URLs from the page
+        const videoLinks = [...html.matchAll(/https:\/\/video\.twimg\.com\/[^\s"]+/g)].map(match => match[0]);
 
         return {
             statusCode: 200,
-            body: JSON.stringify({ media: mediaUrls, debug: html.substring(0, 1000) }), // Send partial HTML for debugging
+            body: JSON.stringify({ media: videoLinks }),
+            headers: { "Content-Type": "application/json" }
         };
     } catch (error) {
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ error: "Failed to fetch media", details: error.message }),
-        };
+        return { statusCode: 500, body: "Error fetching video" };
     }
 };
