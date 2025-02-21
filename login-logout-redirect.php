@@ -1,12 +1,10 @@
-<?php 
-
 // Redirect non-logged-in users to /login/ (except for lost-password and login pages)
-// Redirect logged-in users from the login page to /quizzes/
-// Redirect users to /quizzes/ on 404 error page
+// Redirect logged-in users from the login page to /events/
+// Redirect users to /events/ on 404 error page
 add_action('template_redirect', function() {
     if (is_user_logged_in()) {
         if (is_page('login')) {
-            wp_redirect(home_url('/quizzes/'));
+            wp_redirect(home_url('/events/'));
             exit();
         }
     } elseif (!is_admin() && !is_page(['login', 'lost-password'])) {
@@ -14,9 +12,9 @@ add_action('template_redirect', function() {
         exit();
     }
 
-    // Redirect users to /quizzes/ if they access a 404 page
+    // Redirect users to /events/ if they access a 404 page
     if (is_404()) {
-        wp_redirect(home_url('/quizzes/'));
+        wp_redirect(home_url('/events/'));
         exit();
     }
 });
